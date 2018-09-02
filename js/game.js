@@ -3,7 +3,7 @@ var game = (function () {
     var initialNumberOfPieces = 4,
         currentNumberOfPieces,
         level = 1;
-    startGame = function (newLevel) {
+    var startGame = function (newLevel) {
         if (newLevel === undefined) {
             level = 1;
             currentNumberOfPieces = initialNumberOfPieces
@@ -11,27 +11,27 @@ var game = (function () {
             level = newLevel;
             currentNumberOfPieces = 2 + (level * (initialNumberOfPieces / 2));
         }
-    },
+    };
 
-        getPieces = function () {
-            var pieces = [],
-                i,
-                j,
-                toGuess;
-            for (i = 0; i < currentNumberOfPieces; i++) {
-                pieces.push({});
-                pieces[i].toGuess = false;
-            }
+    var getPieces = function () {
+        var pieces = [],
+            i,
+            j,
+            toGuess;
+        for (i = 0; i < currentNumberOfPieces; i++) {
+            pieces.push({});
+            pieces[i].toGuess = false;
+        }
 
-            for (j = 0; j < level; j++) {
-                let indexToSetTrue = Math.floor(Math.random() * pieces.length);
-                while (pieces[indexToSetTrue].toGuess === true) {
-                    indexToSetTrue = Math.floor(Math.random() * pieces.length);
-                }
-                    pieces[indexToSetTrue].toGuess = true;
+        for (j = 0; j < level; j++) {
+            let indexToSetTrue = Math.floor(Math.random() * pieces.length);
+            while (pieces[indexToSetTrue].toGuess === true) {
+                indexToSetTrue = Math.floor(Math.random() * pieces.length);
             }
-            return pieces;
-        };
+            pieces[indexToSetTrue].toGuess = true;
+        }
+        return pieces;
+    };
 
     getLevel = function () {
         return level;

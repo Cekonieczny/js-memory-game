@@ -1,7 +1,17 @@
 
-body{
+body {
     background-color: darkgrey;
     margin: 0;
+}
+
+/*#pieces {
+    float: right;
+}
+*/
+
+#stripe {
+    margin-left: 20px;
+    float: left;
 }
 
 .avoid-clicks {
@@ -12,56 +22,56 @@ body{
     pointer-events: all;
 }
 
-#highlightTime{
+#highlightTime {
     display: inline-block;
-    position:relative;
+    position: relative;
 }
 
-#highlightTime::after{
-    position:absolute;
-    top:2px;
+#highlightTime::after {
+    position: absolute;
+    top: 2px;
     right: 1em;
-    transition:all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
 }
 
-#highlightTime:hover::after{
+#highlightTime:hover::after {
     right: 2em;
 }
 
-#highlightTime  ::after{
-    content:'seconds';
+#highlightTime ::after {
+    content: 'seconds';
 }
 
-
-.input-container:after{
-    position:absolute;
-    right:0;
-    top:0;
+.input-container:after {
+    position: absolute;
+    right: 0;
+    top: 0;
     content: "seconds"
 }
 
 .blueSquares .square {
-    background:blue;
+    background: blue;
 }
+
 .square {
-    width: 4%;
-    background:white;
-    padding-bottom: 4%;
+    width: 8%;
+    background: white;
+    padding-bottom: 8%;
     float: left;
     margin: 0.5%;
     border-radius: 20%;
 }
 
 .highlightGreen {
-    background:green;
+    background: green;
 }
 
 .highlightBlue {
-    background:blue;
+    background: blue;
 }
 
-.highlightRed{
-    background:red;
+.highlightRed {
+    background: red;
 }
 
 #container {

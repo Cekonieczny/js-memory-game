@@ -1,11 +1,13 @@
 var view = (function () {
     var level = 1,
-        piecesGuessedInOneLevel = [],
+        previousStartGameTimeout,
+        guessAttemptsInOneLevel = [],
         guessAttemptsOverall = [];
 
     //public methods
     var startGame = function () {
-        piecesGuessedInOneLevel = [];
+        clearTimeout(previousStartGameTimeout);
+        guessAttemptsInOneLevel = [];
         updatePiecesGuessedPercentage();
         var highlightTime = document.getElementById("highlightTime").value * 1000;
 
@@ -13,7 +15,7 @@ var view = (function () {
 
         disableOnClickListenersForSquares();
         disableOnClickListenersForButtons();
-        controller.flashPiecesToGuess(highlightTime);
+        previousStartGameTimeout = controller.flashPiecesToGuess(highlightTime);
         setTimeout(enableOnClickListenersForButtons, highlightTime);
         setTimeout(enableOnClickListenersForSquares, highlightTime);
     };
@@ -43,23 +45,33 @@ var view = (function () {
         }
     };
 
+
     var checkIfClickedCorrectly = function (pieceId, toGuess) {
-        let guessed;
+        var attempt = {
+            guessed: false,
+            attemptPieceId: pieceId,
+        };
         if (toGuess === false || wasPieceGuessed(pieceId)) {
-            guessed = false;
-            guessAttemptsOverall.push(guessed);
+            attempt.guessed = false;
+            guessAttemptsOverall.push(attempt);
+            guessAttemptsInOneLevel.push(attempt);
             disableOnClickListenersForSquares();
-            disableOnClickListenersForButtons();
             flashOnePieceRed(1000, pieceId);
-            setTimeout(flashAllPiecesBlue, 1000, 1000);
-            setTimeout(startGame, 2000, level);
+            setTimeout(enableOnClickListenersForSquares,1000);
+            if (failedAttemptsInOneLevel().length > getAllowedFailedAttempts()) {
+                disableOnClickListenersForSquares();
+                disableOnClickListenersForButtons();
+                setTimeout(flashAllPiecesBlue, 1000, 1000);
+                setTimeout(startGame, 2000, level);
+            }
         }
-        if (toGuess === true && wasPieceGuessed(pieceId) === false) {
-            guessed = true;
+        if (toGuess === true && wasPieceGuessed(pieceId) === false && failedAttemptsInOneLevel().length <= getAllowedFailedAttempts()) {
+            console.log(level);
+            attempt.guessed = true;
             toggleHighlightGreen(pieceId);
-            guessAttemptsOverall.push(guessed);
-            piecesGuessedInOneLevel.push(pieceId);
-            if (piecesGuessedInOneLevel.length === level) {
+            guessAttemptsOverall.push(attempt);
+            guessAttemptsInOneLevel.push(attempt);
+            if (successfulAttemptsInOneLevel().length === level) {
                 disableOnClickListenersForSquares();
                 level++;
                 updateLevelInDocument();
@@ -74,17 +86,21 @@ var view = (function () {
         }
         controller.startGame(level);
         updateLevelInDocument();
+        startGame()
     };
 
     var changeLevel = function () {
         var levelInDocument = document.getElementById("level");
         if (levelInDocument.value >= 500) {
             level = 500;
+            updateLevelInDocument();
         }
         if (levelInDocument.value <= 0) {
             level = 1;
+            updateLevelInDocument();
         }
-        updateLevelInDocument();
+        level = levelInDocument.value;
+        startGame();
     };
 
     var changeHighlightTime = function () {
@@ -95,7 +111,18 @@ var view = (function () {
         if (highlightTimeInDocument.value < 0.1) {
             highlightTimeInDocument.value = "0.1";
         }
+        startGame()
     };
+
+    var changeAllowedFailedAttempts = function () {
+        var allowedFailedAttempts = document.getElementById("allowedFailedAttempts");
+        if (allowedFailedAttempts.value > level) {
+            allowedFailedAttempts.value = level;
+        }
+        if (allowedFailedAttempts.value < 0) {
+            allowedFailedAttempts.value = "0";
+        }
+    }
 
     var getLevel = function () {
         return level;
@@ -103,21 +130,25 @@ var view = (function () {
 
 
     //private methods
+    var getAllowedFailedAttempts = function () {
+        return document.getElementById("allowedFailedAttempts").value
+    }
+
     var updatePiecesGuessedPercentage = function () {
         var attemptsGuessed = [],
             piecesGuessedPercentage;
-        if(guessAttemptsOverall === []){
+        if (guessAttemptsOverall.length === 0) {
             document.getElementById("piecesGuessedPercentage").textContent = "0 %"
             return;
         }
         for (let i = 0; i < guessAttemptsOverall.length; i++) {
-            if(guessAttemptsOverall[i] === true){
+            if (guessAttemptsOverall[i].guessed === true) {
                 attemptsGuessed.push(guessAttemptsOverall[i])
             }
         }
-        piecesGuessedPercentage = (attemptsGuessed.length/guessAttemptsOverall.length)*100;
-        document.getElementById("piecesGuessedPercentage").textContent = piecesGuessedPercentage.toFixed(2)+" %"
-    }
+        piecesGuessedPercentage = (attemptsGuessed.length / guessAttemptsOverall.length) * 100;
+        document.getElementById("piecesGuessedPercentage").textContent = piecesGuessedPercentage.toFixed(2) + " %"
+    };
 
     var disableOnClickListenersForSquares = function () {
         var squares = document.getElementsByClassName("square"),
@@ -129,7 +160,7 @@ var view = (function () {
             }
             square.classList.add("avoid-clicks");
         }
-    }
+    };
 
     var enableOnClickListenersForSquares = function () {
         var squares = document.getElementsByClassName("square"),
@@ -141,7 +172,7 @@ var view = (function () {
             }
             square.classList.add("enable-clicks")
         }
-    }
+    };
 
     var disableOnClickListenersForButtons = function () {
         var buttons = document.getElementsByTagName("BUTTON"),
@@ -156,7 +187,7 @@ var view = (function () {
 
     }
 
-    function enableOnClickListenersForButtons() {
+    var enableOnClickListenersForButtons = function () {
         var buttons = document.getElementsByTagName("BUTTON"),
             button;
         for (let i = 0; i < buttons.length; i++) {
@@ -166,17 +197,36 @@ var view = (function () {
             }
             button.classList.add("enable-clicks")
         }
-    }
+    };
+
+    var failedAttemptsInOneLevel = function () {
+        var failedAttemptsInOneLevel = [];
+        for (let i = 0; i < guessAttemptsInOneLevel.length; i++) {
+            if (guessAttemptsInOneLevel[i].guessed === false) {
+                failedAttemptsInOneLevel.push(guessAttemptsInOneLevel[i])
+            }
+        }
+        return failedAttemptsInOneLevel;
+    };
+
+    var successfulAttemptsInOneLevel = function () {
+        var successfulAttemptsInOneLevel = [];
+        for (let i = 0; i < guessAttemptsInOneLevel.length; i++) {
+            if (guessAttemptsInOneLevel[i].guessed === true) {
+                successfulAttemptsInOneLevel.push(guessAttemptsInOneLevel[i])
+            }
+        }
+        return successfulAttemptsInOneLevel;
+    };
 
     var wasPieceGuessed = function (pieceId) {
-        for (let i = 0; i < piecesGuessedInOneLevel.length; i++) {
-            if (piecesGuessedInOneLevel[i] === pieceId) {
+        for (let i = 0; i < successfulAttemptsInOneLevel().length; i++) {
+            if (successfulAttemptsInOneLevel()[i].attemptPieceId === pieceId) {
                 return true;
             }
         }
         return false;
     };
-
 
     var getPieceIdByArrayIndex = function (index) {
         return "piece" + index.toString();
@@ -189,7 +239,7 @@ var view = (function () {
 
     var flashOnePieceRed = function (timeInMs, pieceId) {
         toggleHighlightRed(pieceId);
-        setTimeout(toggleHighlightRed, timeInMs);
+        setTimeout(toggleHighlightRed, timeInMs,pieceId);
     };
 
     var toggleHighlightBlue = function (pieceId) {
@@ -221,6 +271,7 @@ var view = (function () {
 
 
     return {
+        'changeAllowedFailedAttempts': changeAllowedFailedAttempts,
         'changeHighlightTime': changeHighlightTime,
         'checkIfClickedCorrectly': checkIfClickedCorrectly,
         'changeLevel': changeLevel,
