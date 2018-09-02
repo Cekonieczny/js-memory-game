@@ -1,25 +1,41 @@
 var game = (function () {
 
-    var initialNumberOfPieces = 5,
+    var initialNumberOfPieces = 4,
         currentNumberOfPieces,
-        startGame = function (config) {
-            if (config && config.numberOfPieces) {
-                currentNumberOfPieces = config.numberOfPieces;
-            } else {
-                currentNumberOfPieces = initialNumberOfPieces;
-            }
-        },
+        level = 1;
+    startGame = function (newLevel) {
+        if (newLevel === undefined) {
+            level = 1;
+            currentNumberOfPieces = initialNumberOfPieces
+        } else {
+            level = newLevel;
+            currentNumberOfPieces = 2 + (level * (initialNumberOfPieces / 2));
+        }
+    },
 
         getPieces = function () {
-            var i,
-                pieces = [];
-
-            for(i=0; i < currentNumberOfPieces; i++) {
+            var pieces = [],
+                i,
+                j,
+                toGuess;
+            for (i = 0; i < currentNumberOfPieces; i++) {
                 pieces.push({});
+                pieces[i].toGuess = false;
             }
-            pieces[0].toGuess = true;
+
+            for (j = 0; j < level; j++) {
+                let indexToSetTrue = Math.floor(Math.random() * pieces.length);
+                while (pieces[indexToSetTrue].toGuess === true) {
+                    indexToSetTrue = Math.floor(Math.random() * pieces.length);
+                }
+                    pieces[indexToSetTrue].toGuess = true;
+            }
             return pieces;
         };
+
+    getLevel = function () {
+        return level;
+    }
 
     return {
         'startGame': startGame,

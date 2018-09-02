@@ -1,16 +1,16 @@
 describe('Game', function () {
-   it('should have 5 pieces after game start', function () {
+   it('should have 4 pieces after game start', function () {
       var pieces;
-      //zwracam 4
       game.startGame();
 
       pieces = game.getPieces();
 
-      expect(pieces.length).toBe(5);
+      expect(pieces.length).toBe(4);
    });
 
     it('one pieces should be to guess after game start', function () {
         var piecesToGuess;
+
         game.startGame();
 
         piecesToGuess = findPiecesToGuess(game.getPieces());
@@ -20,14 +20,22 @@ describe('Game', function () {
 
     it('should start game with configured number of pieces', function () {
         var pieces,
-            config = {
-               numberOfPieces: 6
-            };
-        game.startGame(config);
+            level = 4;
+        game.startGame(level);
 
         pieces = game.getPieces();
 
-        expect(pieces.length).toBe(6);
+        expect(pieces.length).toBe(10);
+    });
+
+    it('configured number of pieces should be to guess after game start', function () {
+        var piecesToGuess,
+            level = 3;
+        game.startGame(level);
+
+        piecesToGuess = findPiecesToGuess(game.getPieces());
+
+        expect(piecesToGuess.length).toBe(3);
     });
 
 

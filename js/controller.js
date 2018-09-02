@@ -1,16 +1,30 @@
 var controller = function () {
+    var pieces;
     var startGame = function () {
-        var initialNumberOfPieces = view.getInitialNumberOfPieces();
+        var level = view.getLevel();
 
-        game.startGame({
-            numberOfPieces: initialNumberOfPieces
-        });
+        game.startGame(level);
 
-        view.renderPieces(game.getPieces());
+        pieces = game.getPieces();
+        view.renderPieces(pieces);
+    };
 
+    /*var getToGuessPieces = function () {
+        var piecesToGuess = [];
+        for (let i = 0; i < pieces.length; i++) {
+            if (pieces[i].toGuess === true) {
+                piecesToGuess.push(pieces[i]);
+            }
+        }
+    }*/
+
+    var flashPiecesToGuess = function (highlightTime) {
+        view.renderToGuessPieces(pieces);
+        return setTimeout(view.renderToGuessPieces, highlightTime, pieces);
     };
 
     return {
-        'startGame': startGame
+        'flashPiecesToGuess': flashPiecesToGuess,
+        'startGame': startGame,
     }
 }();
