@@ -1,4 +1,4 @@
-<html xmlns:text-align="http://www.w3.org/1999/xhtml">
+
 <head>
     <title> Memory game</title>
     <link rel="stylesheet" type="text/css" href="../css/game.css">
@@ -16,21 +16,23 @@
     <button id="addNewPiecesBtn" onclick="view.addNewPiece()">Add new pieces</button>
 
     <p>Level</p>
-    <div class="numberInput">
-        <input type="number" min="1" max="500" value="1" id="level" onchange="view.changeLevel()"/>
+    <div>
+        <input type="number" min="1" max="500" value="1" id="level" oninput="view.changeLevel()"/>
     </div>
 
-    <p>Highlight time</p>
-<div class="numberInput"><input type="number" min="0.1" max="20" step="0.25" value="2" id="highlightTime" onchange="view.changeHighlightTime()"/> </div>
+    <p>Highlight time in seconds</p>
+    <div><input type="number" min="0.1" max="20" step="0.25" value="2" id="highlightTime"
+                                    oninput="view.changeHighlightTime()"/></div>
 
     <p>Allowed failed attempts</p>
-    <div><input type="number" min="0" max="499" step="1" value="0" id="allowedFailedAttempts" onchange="view.changeAllowedFailedAttempts()"/> </div>
+    <div><input type="number" min="0" max="499" step="1" value="0" id="allowedFailedAttempts"
+                oninput="view.changeAllowedFailedAttempts()"/></div>
 
     <p>Pieces guessed overall percentage</p>
-        <output  id="piecesGuessedPercentage"></output>
+    <output id="piecesGuessedPercentage"></output>
 
 </div>
-<div id="pieces">
+<div style="margin-left: 240px" id="pieces">
 </div>
 
 <script src="../js/game.js"></script>

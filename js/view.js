@@ -1,37 +1,23 @@
 var view = (function () {
-    var level = 1,
-        previousStartGameTimeout,
-        guessAttemptsInOneLevel = [],
-        guessAttemptsOverall = [];
+    var level = 1;
+
 
     //public methods
     var startGame = function () {
-        clearTimeout(previousStartGameTimeout);
-        guessAttemptsInOneLevel = [];
-        updatePiecesGuessedPercentage();
-        var highlightTime = document.getElementById("highlightTime").value * 1000;
-
         controller.startGame(level);
-
-        disableOnClickListenersForSquares();
-        disableOnClickListenersForButtons();
-        previousStartGameTimeout = controller.flashPiecesToGuess(highlightTime);
-        setTimeout(enableOnClickListenersForButtons, highlightTime);
-        setTimeout(enableOnClickListenersForSquares, highlightTime);
     };
-
 
     var renderPieces = function (pieces) {
         removePieces();
         const divs = document.getElementById('pieces');
         for (let i = 0; i < pieces.length; i++) {
-            let currentPieceToGuess = pieces[i].toGuess;
+            let toGuess = pieces[i].toGuess;
             let div = document.createElement('div');
             let pieceId = getPieceIdByArrayIndex(i);
             div.className = "square";
             div.id = pieceId;
             div.addEventListener('click', function () {
-                checkIfClickedCorrectly(pieceId, currentPieceToGuess);
+                controller.checkIfClickedCorrectly(pieceId, toGuess);
             });
             divs.appendChild(div);
         }
@@ -45,62 +31,24 @@ var view = (function () {
         }
     };
 
-
-    var checkIfClickedCorrectly = function (pieceId, toGuess) {
-        var attempt = {
-            guessed: false,
-            attemptPieceId: pieceId,
-        };
-        if (toGuess === false || wasPieceGuessed(pieceId)) {
-            attempt.guessed = false;
-            guessAttemptsOverall.push(attempt);
-            guessAttemptsInOneLevel.push(attempt);
-            disableOnClickListenersForSquares();
-            flashOnePieceRed(1000, pieceId);
-            setTimeout(enableOnClickListenersForSquares,1000);
-            if (failedAttemptsInOneLevel().length > getAllowedFailedAttempts()) {
-                disableOnClickListenersForSquares();
-                disableOnClickListenersForButtons();
-                setTimeout(flashAllPiecesBlue, 1000, 1000);
-                setTimeout(startGame, 2000, level);
-            }
-        }
-        if (toGuess === true && wasPieceGuessed(pieceId) === false && failedAttemptsInOneLevel().length <= getAllowedFailedAttempts()) {
-            console.log(level);
-            attempt.guessed = true;
-            toggleHighlightGreen(pieceId);
-            guessAttemptsOverall.push(attempt);
-            guessAttemptsInOneLevel.push(attempt);
-            if (successfulAttemptsInOneLevel().length === level) {
-                disableOnClickListenersForSquares();
-                level++;
-                updateLevelInDocument();
-                setTimeout(startGame, 1000);
-            }
-        }
-    };
-
     var addNewPiece = function () {
         if (level < 500) {
             level++;
         }
-        controller.startGame(level);
         updateLevelInDocument();
-        startGame()
+        controller.startGame(level);
     };
 
     var changeLevel = function () {
         var levelInDocument = document.getElementById("level");
         if (levelInDocument.value >= 500) {
-            level = 500;
-            updateLevelInDocument();
+            levelInDocument.value = 500;
         }
         if (levelInDocument.value <= 0) {
-            level = 1;
-            updateLevelInDocument();
+            levelInDocument.value = 1;
         }
         level = levelInDocument.value;
-        startGame();
+        controller.startGame(level);
     };
 
     var changeHighlightTime = function () {
@@ -111,7 +59,7 @@ var view = (function () {
         if (highlightTimeInDocument.value < 0.1) {
             highlightTimeInDocument.value = "0.1";
         }
-        startGame()
+        controller.startGame(level);
     };
 
     var changeAllowedFailedAttempts = function () {
@@ -122,32 +70,24 @@ var view = (function () {
         if (allowedFailedAttempts.value < 0) {
             allowedFailedAttempts.value = "0";
         }
+        controller.startGame(level);
     }
 
-    var getLevel = function () {
-        return level;
+    var setLevel = function (newLevel) {
+        level = newLevel;
+        updateLevelInDocument();
     };
 
+    var getHighlightTime = function () {
+        return document.getElementById("highlightTime").value * 1000;
+    }
 
-    //private methods
     var getAllowedFailedAttempts = function () {
         return document.getElementById("allowedFailedAttempts").value
     }
 
     var updatePiecesGuessedPercentage = function () {
-        var attemptsGuessed = [],
-            piecesGuessedPercentage;
-        if (guessAttemptsOverall.length === 0) {
-            document.getElementById("piecesGuessedPercentage").textContent = "0 %"
-            return;
-        }
-        for (let i = 0; i < guessAttemptsOverall.length; i++) {
-            if (guessAttemptsOverall[i].guessed === true) {
-                attemptsGuessed.push(guessAttemptsOverall[i])
-            }
-        }
-        piecesGuessedPercentage = (attemptsGuessed.length / guessAttemptsOverall.length) * 100;
-        document.getElementById("piecesGuessedPercentage").textContent = piecesGuessedPercentage.toFixed(2) + " %"
+        document.getElementById("piecesGuessedPercentage").textContent = controller.getPiecesGuessedPercentage().toFixed(2) + " %"
     };
 
     var disableOnClickListenersForSquares = function () {
@@ -199,35 +139,6 @@ var view = (function () {
         }
     };
 
-    var failedAttemptsInOneLevel = function () {
-        var failedAttemptsInOneLevel = [];
-        for (let i = 0; i < guessAttemptsInOneLevel.length; i++) {
-            if (guessAttemptsInOneLevel[i].guessed === false) {
-                failedAttemptsInOneLevel.push(guessAttemptsInOneLevel[i])
-            }
-        }
-        return failedAttemptsInOneLevel;
-    };
-
-    var successfulAttemptsInOneLevel = function () {
-        var successfulAttemptsInOneLevel = [];
-        for (let i = 0; i < guessAttemptsInOneLevel.length; i++) {
-            if (guessAttemptsInOneLevel[i].guessed === true) {
-                successfulAttemptsInOneLevel.push(guessAttemptsInOneLevel[i])
-            }
-        }
-        return successfulAttemptsInOneLevel;
-    };
-
-    var wasPieceGuessed = function (pieceId) {
-        for (let i = 0; i < successfulAttemptsInOneLevel().length; i++) {
-            if (successfulAttemptsInOneLevel()[i].attemptPieceId === pieceId) {
-                return true;
-            }
-        }
-        return false;
-    };
-
     var getPieceIdByArrayIndex = function (index) {
         return "piece" + index.toString();
     };
@@ -237,24 +148,30 @@ var view = (function () {
         setTimeout(toggleHighlightAllSquaresBlue, timeInMs);
     };
 
-    var flashOnePieceRed = function (timeInMs, pieceId) {
-        toggleHighlightRed(pieceId);
-        setTimeout(toggleHighlightRed, timeInMs,pieceId);
+    var flashAllPiecesWhite = function (timeInMs) {
+        toggleHighlightAllSquaresWhite();
+        setTimeout(toggleHighlightAllSquaresWhite, timeInMs);
     };
 
-    var toggleHighlightBlue = function (pieceId) {
-        var square = document.getElementById(pieceId);
-        square.classList.toggle("highlightBlue");
+    var flashOnePieceRed = function (timeInMs, pieceId) {
+        toggleHighlightRed(pieceId);
+        setTimeout(toggleHighlightRed, timeInMs, pieceId);
+    };
+
+    var toggleHighlightAllSquaresWhite = function () {
+        document.getElementById("pieces").classList.toggle("whiteSquares")
     };
 
     var toggleHighlightGreen = function (pieceId) {
-        var square = document.getElementById(pieceId);
-        square.classList.toggle("highlightGreen");
+        document.getElementById(pieceId).classList.toggle("highlightGreen");
+    };
+
+    var toggleHighlightBlue = function (pieceId) {
+        document.getElementById(pieceId).classList.toggle("highlightBlue");
     };
 
     var toggleHighlightRed = function (pieceId) {
-        var square = document.getElementById(pieceId);
-        square.classList.toggle("highlightRed");
+        document.getElementById(pieceId).classList.toggle("highlightRed");
     };
 
     var toggleHighlightAllSquaresBlue = function () {
@@ -271,14 +188,24 @@ var view = (function () {
 
 
     return {
+        'flashAllPiecesWhite':flashAllPiecesWhite,
+        'updatePiecesGuessedPercentage': updatePiecesGuessedPercentage,
+        'getHighlightTime': getHighlightTime,
+        'getAllowedFailedAttempts': getAllowedFailedAttempts,
+        'disableOnClickListenersForSquares': disableOnClickListenersForSquares,
+        'enableOnClickListenersForSquares': enableOnClickListenersForSquares,
+        'disableOnClickListenersForButtons': disableOnClickListenersForButtons,
+        'enableOnClickListenersForButtons': enableOnClickListenersForButtons,
+        'toggleHighlightGreen': toggleHighlightGreen,
+        'flashAllPiecesBlue': flashAllPiecesBlue,
+        'flashOnePieceRed': flashOnePieceRed,
         'changeAllowedFailedAttempts': changeAllowedFailedAttempts,
         'changeHighlightTime': changeHighlightTime,
-        'checkIfClickedCorrectly': checkIfClickedCorrectly,
         'changeLevel': changeLevel,
         'renderToGuessPieces': renderToGuessPieces,
         'renderPieces': renderPieces,
         'startGame': startGame,
-        'getLevel': getLevel,
+        'setLevel': setLevel,
         'addNewPiece': addNewPiece
     }
 })();

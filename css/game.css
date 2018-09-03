@@ -53,6 +53,10 @@ body {
     background: blue;
 }
 
+.whiteSquares .square {
+    background: white;
+}
+
 .square {
     width: 8%;
     background: white;
