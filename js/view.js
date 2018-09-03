@@ -11,13 +11,12 @@ var view = (function () {
         removePieces();
         const divs = document.getElementById('pieces');
         for (let i = 0; i < pieces.length; i++) {
-            let toGuess = pieces[i].toGuess;
             let div = document.createElement('div');
-            let pieceId = getPieceIdByArrayIndex(i);
+            let pieceId = i.toString();
             div.className = "square";
             div.id = pieceId;
             div.addEventListener('click', function () {
-                controller.checkIfClickedCorrectly(pieceId, toGuess);
+                controller.checkIfClickedCorrectly(pieceId);
             });
             divs.appendChild(div);
         }
@@ -26,7 +25,7 @@ var view = (function () {
     var renderToGuessPieces = function (pieces) {
         for (let i = 0; i < pieces.length; i++) {
             if (pieces[i].toGuess === true) {
-                toggleHighlightBlue(getPieceIdByArrayIndex(i));
+                toggleHighlightBlue(i);
             }
         }
     };
@@ -71,7 +70,7 @@ var view = (function () {
             allowedFailedAttempts.value = "0";
         }
         controller.startGame(level);
-    }
+    };
 
     var setLevel = function (newLevel) {
         level = newLevel;
@@ -80,11 +79,11 @@ var view = (function () {
 
     var getHighlightTime = function () {
         return document.getElementById("highlightTime").value * 1000;
-    }
+    };
 
     var getAllowedFailedAttempts = function () {
         return document.getElementById("allowedFailedAttempts").value
-    }
+    };
 
     var updatePiecesGuessedPercentage = function () {
         document.getElementById("piecesGuessedPercentage").textContent = controller.getPiecesGuessedPercentage().toFixed(2) + " %"
@@ -139,9 +138,6 @@ var view = (function () {
         }
     };
 
-    var getPieceIdByArrayIndex = function (index) {
-        return "piece" + index.toString();
-    };
 
     var flashAllPiecesBlue = function (timeInMs) {
         toggleHighlightAllSquaresBlue();
@@ -153,9 +149,9 @@ var view = (function () {
         setTimeout(toggleHighlightAllSquaresWhite, timeInMs);
     };
 
-    var flashOnePieceRed = function (timeInMs, pieceId) {
+    var flashOnePieceRed = function (pieceId,timeInMs) {
         toggleHighlightRed(pieceId);
-        setTimeout(toggleHighlightRed, timeInMs, pieceId);
+        setTimeout(toggleHighlightRed, timeInMs,pieceId);
     };
 
     var toggleHighlightAllSquaresWhite = function () {
