@@ -39,14 +39,14 @@ var view = (function () {
     };
 
     var changeLevel = function () {
-        var levelInDocument = document.getElementById("level");
-        if (levelInDocument.value >= 500) {
-            levelInDocument.value = 500;
+        var levelInDocumentValue = parseInt(document.getElementById("level").value);
+        if (levelInDocumentValue >= 500) {
+            levelInDocumentValue = 500;
         }
-        if (levelInDocument.value <= 0) {
-            levelInDocument.value = 1;
+        if (levelInDocumentValue <= 0) {
+            levelInDocumentValue = 1;
         }
-        level = levelInDocument.value;
+        level = levelInDocumentValue;
         controller.startGame(level);
     };
 

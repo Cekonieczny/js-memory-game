@@ -8,13 +8,11 @@ var controller = function () {
 
         level = newLevel;
         view.updatePiecesGuessedPercentage();
-        if(level>1){
-            clearTimeout(previousStartGameTimeout);
-        }
+        clearTimeout(previousStartGameTimeout);
 
         highlightTime = view.getHighlightTime();
 
-        game.startGame(level);
+        game.startGame(newLevel);
 
         pieces = game.getPieces();
         view.renderPieces(pieces);
@@ -34,8 +32,8 @@ var controller = function () {
         var piece = game.checkIfPieceWasGuessed(pieceId, pieces);
         if (piece.guessed === false) {
             view.disableOnClickListenersForSquares();
-            view.flashOnePieceRed(pieceId,1000);
-            setTimeout(view.enableOnClickListenersForSquares,1000);
+            view.flashOnePieceRed(pieceId, 1000);
+            setTimeout(view.enableOnClickListenersForSquares, 1000);
             if (game.getFailedAttemptsInOneLevel().length > view.getAllowedFailedAttempts()) {
                 view.disableOnClickListenersForSquares();
                 view.disableOnClickListenersForButtons();
@@ -44,8 +42,8 @@ var controller = function () {
             }
         }
         if (piece.guessed === true) {
-                view.toggleHighlightGreen(piece.id);
-            if (game.getNextLevel()) {
+            view.toggleHighlightGreen(piece.id);
+            if (game.getLevel() === level + 1) {
                 incrementLevel();
                 view.disableOnClickListenersForSquares();
                 setTimeout(view.flashAllPiecesWhite, 1000, 1000);
@@ -54,7 +52,7 @@ var controller = function () {
         }
     };
 
-    var getPiecesGuessedPercentage= function () {
+    var getPiecesGuessedPercentage = function () {
         return game.getPiecesGuessedPercentage();
     };
 
@@ -62,7 +60,6 @@ var controller = function () {
         level++;
         view.setLevel(level);
     };
-
 
 
     return {

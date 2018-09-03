@@ -4,17 +4,14 @@ var game = (function () {
         currentNumberOfPieces,
         level = 1,
         guessAttemptsInOneLevel = [],
-        guessAttemptsOverall = [],
-        nextLevel = false;
+        guessAttemptsOverall = [];
 
     var startGame = function (newLevel) {
         guessAttemptsInOneLevel = [];
-        nextLevel = false;
-        if (newLevel === undefined) {
-            level = 1;
-            currentNumberOfPieces = initialNumberOfPieces
+        level = newLevel;
+        if (level === 1) {
+            currentNumberOfPieces = initialNumberOfPieces;
         } else {
-            level = newLevel;
             currentNumberOfPieces = 2 + (level * (initialNumberOfPieces / 2));
         }
     };
@@ -30,11 +27,11 @@ var game = (function () {
 
 
         for (i = 0; i < currentNumberOfPieces; i++) {
-                pieces.push({});
-                pieces[i].toGuess = false;
-                pieces[i].id = i;
-                pieces[i].guessed = false;
-            }
+            pieces.push({});
+            pieces[i].toGuess = false;
+            pieces[i].id = i;
+            pieces[i].guessed = false;
+        }
 
         for (j = 0; j < level; j++) {
             let indexToSetTrue = Math.floor(Math.random() * pieces.length);
@@ -63,7 +60,6 @@ var game = (function () {
             guessAttemptsInOneLevel.push(piece);
             if (getSuccessfulAttemptsInOneLevel().length === level) {
                 level++;
-                nextLevel = true;
                 return piece;
             }
             return piece;
@@ -71,8 +67,9 @@ var game = (function () {
     };
 
     var getFailedAttemptsInOneLevel = function () {
-        var failedAttemptsInOneLevel = [];
-        for (let i = 0; i < guessAttemptsInOneLevel.length; i++) {
+        var failedAttemptsInOneLevel = [],
+            i;
+        for (i = 0; i < guessAttemptsInOneLevel.length; i++) {
             if (guessAttemptsInOneLevel[i].guessed === false) {
                 failedAttemptsInOneLevel.push(guessAttemptsInOneLevel[i])
             }
@@ -81,8 +78,9 @@ var game = (function () {
     };
 
     var getSuccessfulAttemptsInOneLevel = function () {
-        var successfulAttemptsInOneLevel = [];
-        for (let i = 0; i < guessAttemptsInOneLevel.length; i++) {
+        var successfulAttemptsInOneLevel = [],
+            i;
+        for (i = 0; i < guessAttemptsInOneLevel.length; i++) {
             if (guessAttemptsInOneLevel[i].guessed === true) {
                 successfulAttemptsInOneLevel.push(guessAttemptsInOneLevel[i])
             }
@@ -106,7 +104,7 @@ var game = (function () {
     var findPieceById = function (pieceId, pieces) {
         var i;
         for (i = 0; i < pieces.length; i++) {
-            if (pieces[i].id === parseInt(pieceId,10)) {
+            if (pieces[i].id === parseInt(pieceId, 10)) {
                 return pieces[i];
             }
         }
@@ -126,7 +124,6 @@ var game = (function () {
         'getPieces': getPieces,
         'getLevel': getLevel,
         'getFailedAttemptsInOneLevel': getFailedAttemptsInOneLevel,
-        'getSuccessfulAttemptsInOneLevel': getSuccessfulAttemptsInOneLevel,
         'checkIfPieceWasGuessed': checkIfPieceWasGuessed,
     }
 })
