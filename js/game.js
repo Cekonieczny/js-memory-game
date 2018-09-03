@@ -4,7 +4,8 @@ var game = (function () {
         currentNumberOfPieces,
         level = 1,
         guessAttemptsInOneLevel = [],
-        guessAttemptsOverall = [];
+        guessFailedAttemptsOverall = [],
+        guessSuccessfulAttemptsOverall = [];
 
     var startGame = function (newLevel) {
         guessAttemptsInOneLevel = [];
@@ -23,7 +24,8 @@ var game = (function () {
             pieces = [],
             toGuess,
             id,
-            guessed;
+            guessed,
+            indexToSetTrue;
 
 
         for (i = 0; i < currentNumberOfPieces; i++) {
@@ -34,7 +36,7 @@ var game = (function () {
         }
 
         for (j = 0; j < level; j++) {
-            let indexToSetTrue = Math.floor(Math.random() * pieces.length);
+            indexToSetTrue = Math.floor(Math.random() * pieces.length);
             while (pieces[indexToSetTrue].toGuess === true) {
                 indexToSetTrue = Math.floor(Math.random() * pieces.length);
             }
@@ -50,20 +52,20 @@ var game = (function () {
 
         if (piece.toGuess === false || piece.guessed) {
             piece.guessed = false;
-            guessAttemptsOverall.push(piece);
+            guessFailedAttemptsOverall.push(piece);
             guessAttemptsInOneLevel.push(piece);
             return piece;
         }
-        if (piece.toGuess === true && piece.guessed === false) {
+        if (piece.toGuess === true) {
             piece.guessed = true;
-            guessAttemptsOverall.push(piece);
+            guessSuccessfulAttemptsOverall.push(piece);
             guessAttemptsInOneLevel.push(piece);
             if (getSuccessfulAttemptsInOneLevel().length === level) {
                 level++;
                 return piece;
             }
-            return piece;
         }
+        return piece;
     };
 
     var getFailedAttemptsInOneLevel = function () {
@@ -89,16 +91,10 @@ var game = (function () {
     };
 
     var getPiecesGuessedPercentage = function () {
-        var attemptsGuessed = [];
-        if (guessAttemptsOverall.length === 0) {
+        if (guessFailedAttemptsOverall.length === 0 && guessSuccessfulAttemptsOverall.length === 0) {
             return 0;
         }
-        for (let i = 0; i < guessAttemptsOverall.length; i++) {
-            if (guessAttemptsOverall[i].guessed === true) {
-                attemptsGuessed.push(guessAttemptsOverall[i])
-            }
-        }
-        return (attemptsGuessed.length / guessAttemptsOverall.length) * 100;
+        return (guessSuccessfulAttemptsOverall.length / (guessFailedAttemptsOverall.length + guessSuccessfulAttemptsOverall.length)) * 100;
     };
 
     var findPieceById = function (pieceId, pieces) {
@@ -109,16 +105,11 @@ var game = (function () {
             }
         }
     };
-    getLevel = function () {
+    var getLevel = function () {
         return level;
     };
 
-    getNextLevel = function () {
-        return nextLevel;
-    }
-
     return {
-        'getNextLevel': getNextLevel,
         'getPiecesGuessedPercentage': getPiecesGuessedPercentage,
         'startGame': startGame,
         'getPieces': getPieces,

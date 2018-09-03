@@ -1,47 +1,40 @@
 describe('Controller', function () {
-    it('should have 4 pieces after game start', function () {
-        var pieces;
-        game.startGame();
+    it('should call every method in start game except timeouts', function () {
+        var dummyElement = document.createElement('div'),
+            pieces = [];
 
-        pieces = game.getPieces();
+        pieces.push({});
+        pieces[0].toGuess=true;
+        pieces[0].id = 0;
+        pieces[0].guessed = false,
 
-        expect(pieces.length).toBe(4);
+        document.getElementById = jasmine.createSpy('HTML Element').and.returnValue(dummyElement);
+
+
+        spyOn(view,'updatePiecesGuessedPercentage');
+        spyOn(controller,'getPiecesGuessedPercentage').and.returnValue(0);
+        spyOn(view,'getHighlightTime').and.returnValue(2);
+        spyOn(game,'getPieces').and.returnValue(pieces);
+        spyOn(game,'startGame');
+        spyOn(view,'renderPieces');
+        spyOn(view,'disableOnClickListenersForSquares');
+        spyOn(view,'disableOnClickListenersForButtons');
+        //spyOn(controller,'flashPiecesToGuess');
+        //spyOn(view,'enableOnClickListenersForSquares');
+        //spyOn(view,'enableOnClickListenersForButtons');
+        controller.startGame(1);
+
+
+
+
+
+        expect(view.getHighlightTime).toHaveBeenCalledTimes(1);
+        expect(game.startGame).toHaveBeenCalledTimes(1);
+        expect(game.getPieces).toHaveBeenCalledTimes(1);
+        expect(view.renderPieces).toHaveBeenCalledTimes(1);
+        expect(view.disableOnClickListenersForSquares).toHaveBeenCalledTimes(1);
+        expect(view.disableOnClickListenersForButtons).toHaveBeenCalledTimes(1);
+        //expect(controller.flashPiecesToGuess).toHaveBeenCalledTimes(1);
     });
 
-    it('one pieces should be to guess after game start', function () {
-        var piecesToGuess;
-
-        game.startGame();
-
-        piecesToGuess = findPiecesToGuess(game.getPieces());
-
-        expect(piecesToGuess.length).toBe(1);
-    });
-
-    it('should start game with configured number of pieces', function () {
-        var pieces,
-            level = 4;
-        game.startGame(level);
-
-        pieces = game.getPieces();
-
-        expect(pieces.length).toBe(10);
-    });
-
-    it('configured number of pieces should be to guess after game start', function () {
-        var piecesToGuess,
-            level = 3;
-        game.startGame(level);
-
-        piecesToGuess = findPiecesToGuess(game.getPieces());
-
-        expect(piecesToGuess.length).toBe(3);
-    });
-
-
-    function findPiecesToGuess(pieces) {
-        return pieces.filter(function (piece) {
-            return piece.toGuess;
-        });
-    }
 });

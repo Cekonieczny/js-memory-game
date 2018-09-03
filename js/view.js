@@ -8,11 +8,14 @@ var view = (function () {
     };
 
     var renderPieces = function (pieces) {
-        removePieces();
-        const divs = document.getElementById('pieces');
-        for (let i = 0; i < pieces.length; i++) {
-            let div = document.createElement('div');
-            let pieceId = i.toString();
+        var i,
+            divs;
+            removePieces();
+            divs = document.getElementById('pieces');
+            for (i = 0; i < pieces.length; i++) {
+            let div = document.createElement('div'),
+            pieceId = i.toString();
+
             div.className = "square";
             div.id = pieceId;
             div.addEventListener('click', function () {
@@ -91,8 +94,9 @@ var view = (function () {
 
     var disableOnClickListenersForSquares = function () {
         var squares = document.getElementsByClassName("square"),
-            square;
-        for (let i = 0; i < squares.length; i++) {
+            square,
+            i;
+        for (i = 0; i < squares.length; i++) {
             square = squares[i];
             if (square.classList.contains("enable-clicks")) {
                 square.classList.remove("enable-clicks")
@@ -103,8 +107,9 @@ var view = (function () {
 
     var enableOnClickListenersForSquares = function () {
         var squares = document.getElementsByClassName("square"),
-            square;
-        for (let i = 0; i < squares.length; i++) {
+            square,
+            i;
+        for (i = 0; i < squares.length; i++) {
             square = squares[i];
             if (square.classList.contains("avoid-clicks")) {
                 square.classList.remove("avoid-clicks");
@@ -115,8 +120,9 @@ var view = (function () {
 
     var disableOnClickListenersForButtons = function () {
         var buttons = document.getElementsByTagName("BUTTON"),
-            button;
-        for (let i = 0; i < buttons.length; i++) {
+            button,
+            i;
+        for (i = 0; i < buttons.length; i++) {
             button = buttons[i];
             if (button.classList.contains("enable-clicks")) {
                 button.classList.remove("enable-clicks")
@@ -128,8 +134,9 @@ var view = (function () {
 
     var enableOnClickListenersForButtons = function () {
         var buttons = document.getElementsByTagName("BUTTON"),
-            button;
-        for (let i = 0; i < buttons.length; i++) {
+            button,
+            i;
+        for (i = 0; i < buttons.length; i++) {
             button = buttons[i];
             if (button.classList.contains("avoid-clicks")) {
                 button.classList.remove("avoid-clicks");
